@@ -1,38 +1,17 @@
-import { ApolloServer, gql } from "apollo-server";
-import { organizationsResolver, zonesResolver } from "./resolvers";
-
-const typeDefs: any = gql`
-  type Organization {
-    id: ID!
-    name: String!
-    zones: [Zone!]!
-  }
-
-  type Zone {
-    id: ID!
-    name: String!
-    organization: Organization!
-  }
-
-  input OrganizationsInput {
-    id: ID
-    ids: [ID!]
-  }
-
-  input ZonesInput {
-    id: ID
-    ids: [ID!]
-  }
-
-  type Query {
-    organizations(input: OrganizationsInput): [Organization!]!
-    zones(input: ZonesInput): [Zone!]!
-  }
-`;
+import { ApolloServer } from "apollo-server";
+import {
+  organizationResolver,
+  organizationsResolver,
+  zoneResolver,
+  zonesResolver,
+} from "./resolvers";
+import typeDefs from "./typeDefs";
 
 const resolvers: any = {
   Query: {
+    organization: organizationResolver,
     organizations: organizationsResolver,
+    zone: zoneResolver,
     zones: zonesResolver,
   },
 };

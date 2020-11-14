@@ -2,15 +2,45 @@
   "organizations": [
     {
       "name": "organization 0",
-      "id": "organization_0_id",
-      "zones": ["zone_0_id"]
+      "id": "org0id",
+      "zones": ["zone0id", "zone0id", "zone1id", "zone2id", "zone3id"]
+    },
+    {
+      "name": "organization 1",
+      "id": "org1id",
+      "zones": ["zone4id", "zone5id"]
     }
   ],
   "zones": [
     {
-      "name": "zone-0",
-      "id": "zone_0_id",
-      "organization": "organization_0_id"
+      "name": "zone0",
+      "id": "zone0id",
+      "organization": "org0id"
+    },
+    {
+      "name": "zone1",
+      "id": "zone1id",
+      "organization": "org0id"
+    },
+    {
+      "name": "zone2",
+      "id": "zone2id",
+      "organization": "org0id"
+    },
+    {
+      "name": "zone3",
+      "id": "zone3id",
+      "organization": "org0id"
+    },
+    {
+      "name": "zone4",
+      "id": "zone4id",
+      "organization": "org1id"
+    },
+    {
+      "name": "zone5",
+      "id": "zone5id",
+      "organization": "org1id"
     }
   ]
 }

@@ -1,5 +1,20 @@
 import db from "./db.json";
 
+// export const organizationsResolver = (
+//   parent: any,
+//   args: any,
+//   ctx: any,
+//   info: any
+// ) => {};
+
+// export const zonesResolver = (
+//   parent: any,
+//   args: any,
+//   ctx: any,
+//   info: any
+// ) => {};
+// ////////////////////// DIRECT OBJECTS ///////////////////////////
+
 export const organizationsResolver = (
   parent: any,
   args: any,
@@ -37,12 +52,11 @@ export const zonesResolver = async (
   info: any
 ) => {
   let zones = db.zones;
-  if (args.input.id) {
-    zones = zones.filter((zone) => zone.id !== args.input.id);
-  }
+
+  if (!args.input) return [];
 
   if (args.input.ids) {
-    zones = zones.filter((zone) => !args.input.ids.includes(zone.id));
+    zones = zones.filter((zone) => args.input.ids.includes(zone.id));
   }
 
   return zones.map((zone) => {
@@ -50,12 +64,61 @@ export const zonesResolver = async (
       id: zone.id,
       name: zone.name,
       organization: () =>
-        organizationsResolver(
+        organizationResolver(
           parent,
           { input: { id: zone.organization } },
           ctx,
           info
-        )[0],
+        ),
     };
   });
+};
+export const organizationResolver = async (
+  _parent: any,
+  args: any,
+  _ctx: any,
+  _info: any
+) => {
+  let organizations = db.organizations;
+  if (!args.input) return null;
+
+  const organization = organizations.find((org) => org.id === args.input.id);
+
+  if (!organization) return null;
+
+  return {
+    ...organization,
+    zones: () =>
+      zonesResolver(
+        _parent,
+        { input: { ids: organization.zones } },
+        _ctx,
+        _info
+      ),
+  };
+};
+
+export const zoneResolver = async (
+  _parent: any,
+  args: any,
+  _ctx: any,
+  _info: any
+) => {
+  let zones = db.zones;
+  if (!args.input) return null;
+
+  const zone = zones.find((zone) => zone.id === args.input.id);
+
+  if (!zone) return null;
+
+  return {
+    ...zone,
+    organization: () =>
+      organizationResolver(
+        _parent,
+        { input: { id: zone.organization } },
+        _ctx,
+        _info
+      ),
+  };
 };

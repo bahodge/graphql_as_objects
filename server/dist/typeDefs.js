@@ -12,7 +12,7 @@ exports.default = apollo_server_1.gql `
   type Zone {
     id: ID!
     name: String!
-    organization: Organization!
+    organization: Organization
   }
 
   input OrganizationsInput {

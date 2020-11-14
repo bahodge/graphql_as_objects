@@ -11,7 +11,7 @@ export default gql`
   type Zone {
     id: ID!
     name: String!
-    organization: Organization!
+    organization: Organization
   }
 
   input OrganizationsInput {

@@ -5,42 +5,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.zoneResolver = exports.organizationResolver = exports.zonesResolver = exports.organizationsResolver = void 0;
 const db_json_1 = __importDefault(require("./db.json"));
-// export const organizationsResolver = (
-//   parent: any,
-//   args: any,
-//   ctx: any,
-//   info: any
-// ) => {};
-// export const zonesResolver = (
-//   parent: any,
-//   args: any,
-//   ctx: any,
-//   info: any
-// ) => {};
-// ////////////////////// DIRECT OBJECTS ///////////////////////////
+////////////////////// DIRECT OBJECTS ///////////////////////////
 exports.organizationsResolver = (parent, args, ctx, info) => {
-    let orgs = db_json_1.default.organizations;
-    if (args.input.id) {
-        orgs = orgs.filter((org) => org.id === args.input.id);
-    }
-    if (args.input.ids) {
-        orgs = orgs.filter((org) => args.input.ids.includes(org.id));
-    }
+    if (!args.input.ids)
+        return [];
+    if (!ctx.currentUser)
+        throw new Error("No current user");
+    const filtered = args.input.ids.filter((id) => {
+        return ctx.currentUser.isMemberOfOrganization(id);
+    });
+    const orgs = db_json_1.default.organizations.filter((org) => filtered.includes(org.id));
     return orgs.map((org) => {
         return {
             id: org.id,
             name: org.name,
-            zones: () => exports.zonesResolver(parent, args || { input: { ids: [org.zones] } }, ctx, info),
+            zones: () => exports.zonesResolver(parent, { input: { ids: org.zones } }, ctx, info),
         };
     });
 };
 exports.zonesResolver = async (parent, args, ctx, info) => {
-    let zones = db_json_1.default.zones;
     if (!args.input)
         return [];
-    if (args.input.ids) {
-        zones = zones.filter((zone) => args.input.ids.includes(zone.id));
-    }
+    if (!args.input.ids)
+        return [];
+    if (!ctx.currentUser)
+        throw new Error("No current user");
+    const filtered = args.input.ids.filter((id) => {
+        return ctx.currentUser.isMemberOfZone(id);
+    });
+    const zones = db_json_1.default.zones.filter((zone) => filtered.includes(zone.id));
     return zones.map((zone) => {
         return {
             id: zone.id,
@@ -49,28 +42,34 @@ exports.zonesResolver = async (parent, args, ctx, info) => {
         };
     });
 };
-exports.organizationResolver = async (_parent, args, _ctx, _info) => {
-    let organizations = db_json_1.default.organizations;
+exports.organizationResolver = async (parent, args, ctx, info) => {
     if (!args.input)
         return null;
-    const organization = organizations.find((org) => org.id === args.input.id);
+    if (!ctx.currentUser)
+        throw new Error("No current user");
+    if (!ctx.currentUser.isMemberOfOrganization(args.input.id))
+        return null;
+    const organization = db_json_1.default.organizations.find((organization) => args.input.id === organization.id);
     if (!organization)
         return null;
     return {
         ...organization,
-        zones: () => exports.zonesResolver(_parent, { input: { ids: organization.zones } }, _ctx, _info),
+        zones: () => exports.zonesResolver(parent, { input: { ids: organization.zones } }, ctx, info),
     };
 };
-exports.zoneResolver = async (_parent, args, _ctx, _info) => {
-    let zones = db_json_1.default.zones;
+exports.zoneResolver = async (parent, args, ctx, info) => {
     if (!args.input)
         return null;
-    const zone = zones.find((zone) => zone.id === args.input.id);
+    if (!ctx.currentUser)
+        throw new Error("No current user");
+    if (!ctx.currentUser.isMemberOfZone(args.input.id))
+        return null;
+    const zone = db_json_1.default.zones.find((zone) => args.input.id === zone.id);
     if (!zone)
         return null;
     return {
         ...zone,
-        organization: () => exports.organizationResolver(_parent, { input: { id: zone.organization } }, _ctx, _info),
+        organization: () => exports.organizationResolver(parent, { input: { id: zone.organization } }, ctx, info),
     };
 };
 //# sourceMappingURL=resolvers.js.map

@@ -6,6 +6,7 @@ import {
   zonesResolver,
 } from "./resolvers";
 import typeDefs from "./typeDefs";
+import User from "./User";
 
 const resolvers: any = {
   Query: {
@@ -16,7 +17,34 @@ const resolvers: any = {
   },
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const rawUser = {
+  id: "userid",
+  name: "benji",
+  organizationMemberships: [
+    {
+      organization: {
+        id: "org0id",
+        name: "organization 0",
+      },
+      zoneMemberships: [
+        {
+          zone: {
+            id: "zone0id",
+            name: "zone 0",
+          },
+        },
+      ],
+    },
+  ],
+};
+
+const currentUser = new User(rawUser);
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: { currentUser },
+});
 
 // The `listen` method launches a web server.
 server.listen().then(({ url }) => {

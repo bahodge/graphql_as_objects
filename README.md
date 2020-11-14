@@ -5,19 +5,24 @@ This is a proof of concept for my company to shift our API to use objects instea
 ## How to use
 
 - `yarn dev`
+- open the playground
+- you can use this query to get started
 
 ```graphql
 {
-  organizations {
+  zone(input: { id: "zone0id" }) {
+    id
+    name
+    organization {
+      id
+      name
+    }
+  }
+  organization(input: { id: "org0id" }) {
     id
     name
     zones {
       id
-      name
-      organization {
-        id
-        name
-      }
     }
   }
 }

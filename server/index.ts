@@ -1,5 +1,4 @@
 import { ApolloServer, gql } from "apollo-server";
-import db from "./db.json";
 import { organizationsResolver, zonesResolver } from "./resolvers";
 
 const typeDefs: any = gql`
@@ -14,9 +13,20 @@ const typeDefs: any = gql`
     name: String!
     organization: Organization!
   }
+
+  input OrganizationsInput {
+    id: ID
+    ids: [ID!]
+  }
+
+  input ZonesInput {
+    id: ID
+    ids: [ID!]
+  }
+
   type Query {
-    organizations: [Organization!]!
-    zones: [Zone!]!
+    organizations(input: OrganizationsInput): [Organization!]!
+    zones(input: ZonesInput): [Zone!]!
   }
 `;
 

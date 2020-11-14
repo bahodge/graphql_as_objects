@@ -7,19 +7,25 @@ export const organizationsResolver = (
   info: any
 ) => {
   let orgs = db.organizations;
-  if (args.id) {
-    orgs = orgs.filter((org) => org.id === args.id);
+  if (args.input.id) {
+    orgs = orgs.filter((org) => org.id === args.input.id);
   }
 
-  if (args.ids) {
-    orgs = orgs.filter((org) => args.ids.includes(org.id));
+  if (args.input.ids) {
+    orgs = orgs.filter((org) => args.input.ids.includes(org.id));
   }
 
   return orgs.map((org) => {
     return {
       id: org.id,
       name: org.name,
-      zones: () => zonesResolver(parent, { ids: [org.zones] }, ctx, info),
+      zones: () =>
+        zonesResolver(
+          parent,
+          args || { input: { ids: [org.zones] } },
+          ctx,
+          info
+        ),
     };
   });
 };
@@ -31,12 +37,12 @@ export const zonesResolver = async (
   info: any
 ) => {
   let zones = db.zones;
-  if (args.id) {
-    zones = zones.filter((zone) => zone.id !== args.id);
+  if (args.input.id) {
+    zones = zones.filter((zone) => zone.id !== args.input.id);
   }
 
-  if (args.ids) {
-    zones = zones.filter((zone) => !args.ids.includes(zone.id));
+  if (args.input.ids) {
+    zones = zones.filter((zone) => !args.input.ids.includes(zone.id));
   }
 
   return zones.map((zone) => {
@@ -46,7 +52,7 @@ export const zonesResolver = async (
       organization: () =>
         organizationsResolver(
           parent,
-          { id: zone.organization.id },
+          { input: { id: zone.organization } },
           ctx,
           info
         )[0],

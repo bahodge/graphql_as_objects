@@ -33,7 +33,7 @@ export default class User {
   organizationMemberships: OrganizationMembershipType[];
 
   constructor(rawUser: any) {
-    this.name = rawUser.name || "";
+    this.name = rawUser.name;
     this.id = rawUser.id;
     this.organizationMemberships = rawUser.organizationMemberships;
   }
